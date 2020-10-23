@@ -162,7 +162,13 @@ const USER_IDS_CONFIG = {
   'vmuid': {
     source: 'verizonmedia.com',
     atype: 1
-  }
+  },
+
+  // bidswitchId
+  'bsw_id': {
+    source: 'bidswitch.net',
+    atype: 1
+  },
 };
 
 // this function will create an eid object for the given UserId sub-module

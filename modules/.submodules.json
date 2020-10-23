@@ -18,7 +18,8 @@
     "quantcastIdSystem",
     "idxIdSystem",
     "fabrickIdSystem",
-    "verizonMediaIdSystem"
+    "verizonMediaIdSystem",
+    "bidswitchIdSystem"
   ],
   "adpod": [
     "freeWheelAdserverVideo",
