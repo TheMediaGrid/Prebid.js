@@ -74,12 +74,7 @@ export const bidswitchSubmodule = {
         },
         error: error => {
           utils.logError(`${MODULE_NAME}: bswId fetch encountered an error`, error);
-          let responseObj = {fpId: 'fpId234r23rv32r', userId: 'userIdwq32f3d2fd2f2'};
-          const {userId, fpId} = responseObj || {};
-          if (fpId) {
-            setFirstPartyId(fpId);
-          }
-          callback(userId);
+          callback();
         }
       };
       ajax(url, callbacks, undefined, {method: 'GET', withCredentials: true});
