@@ -52,8 +52,8 @@ export const bidswitchSubmodule = {
       return;
     }
     const firstPartyId = getFirstPartyId();
-    const url = `https://grid.bidswitch.net/syncme?1st_party_uid=${firstPartyId}&gdpr=${hasGdpr}&gdpr_consent=${gdprConsentString}&us_privacy=${uspConsent}`;
-    //const url = `https://api.rlcdn.com/api/identity/envelope?pid=${configParams.pid}${hasGdpr ? (tcfPolicyV2 ? '&ct=4&cv=' : '&ct=1&cv=') + gdprConsentString : ''}`;
+    const domain = configParams.devMode ? 'dev.verona.iponweb.net' : 'grid.bidswitch.net';
+    const url = `https://${domain}/syncme?1st_party_uid=${firstPartyId}&gdpr=${hasGdpr}&gdpr_consent=${gdprConsentString}&us_privacy=${uspConsent}`;
     let resp;
     resp = function (callback) {
       const callbacks = {
