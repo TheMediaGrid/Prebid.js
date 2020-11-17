@@ -61,7 +61,7 @@ export const bidswitchSubmodule = {
           let responseObj;
           if (response) {
             try {
-              responseObj = JSON.parse(response);
+              responseObj = typeof response === 'string' ? JSON.parse(response) : response;
             } catch (error) {
               utils.logError(error);
             }
@@ -77,7 +77,8 @@ export const bidswitchSubmodule = {
           callback();
         }
       };
-      ajax(url, callbacks, undefined, {method: 'GET', withCredentials: true});
+      jsonPRequest(url, callbacks);
+      // ajax(url, callbacks, undefined, {method: 'GET', withCredentials: true});
     };
 
     return {callback: resp};
@@ -99,6 +100,42 @@ function setFirstPartyId(fpId) {
     } else if (storage.cookiesAreEnabled) {
       storage.setCookie(FPID_KEY_NAME, fpId);
     }
+  }
+}
+
+function jsonPRequest(url, callback) {
+  let callbacks = typeof callback === 'object' && callback !== null ? callback : {
+    success: function() {},
+    error: function(e) {}
+  };
+
+  if (typeof callback === 'function') {
+    callbacks.success = callback;
+  }
+  const cbName = 'bsw_cb_' + Math.random().toString(32).slice(2);
+  window[cbName] = function(data) {
+    delete window[cbName];
+    callbacks.success(data);
+  };
+  const script = document.createElement('script');
+  const afterScript = () => {
+    delete window[cbName];
+    script.parentNode && script.parentNode.removeChild(script);
+  };
+  script.setAttribute('type', 'text/javascript');
+  script.src = url + '&cb=' + cbName;
+  script.onload = () => {
+    setTimeout(afterScript, 100);
+  };
+  script.onerror = (error) => {
+    afterScript();
+    callbacks.error(error && (error.message || error.error) && new Error(error.message || error.error) || new Error('Unknown script error'));
+  };
+  const head = (document.getElementsByTagName('head') || [])[0];
+  if (head) {
+    head.appendChild(script);
+  } else {
+    callbacks.error(new Error('There is no head tag'));
   }
 }
 
