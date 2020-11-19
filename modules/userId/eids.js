@@ -167,7 +167,13 @@ const USER_IDS_CONFIG = {
   // bidswitchId
   'bsw_id': {
     source: 'bidswitch.net',
-    atype: 1
+    atype: 1,
+    getValue: function(data) {
+      return data && data.id;
+    },
+    getUidExt: function(data) {
+      return data && data.ext;
+    }
   },
 };
 

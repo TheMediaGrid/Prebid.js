@@ -13,7 +13,8 @@ import { uspDataHandler } from '../src/adapterManager.js';
 
 const MODULE_NAME = 'bidswitchId';
 const ID_NAME = 'bsw_id';
-const FPID_KEY_NAME = '1st_bsw_uid';
+const FPID_NAME = 'fpId';
+const FPID_STRG_KEY_NAME = '1st_bsw_uid';
 
 export const storage = getStorageManager();
 
@@ -27,11 +28,12 @@ export const bidswitchSubmodule = {
   /**
    * decode the stored id value for passing to bid requests
    * @function
-   * @param {string} value
-   * @returns {{bsw_id:string}}
+   * @param {{userId: string, fpId: string}} value
+   * @returns {{bsw_id:{id:string, ext: object}}}
    */
-  decode(value) {
-    return { [ID_NAME]: value }
+  decode(value = {}) {
+    const {userId: id, ...ext} = value;
+    return { [ID_NAME]: { id, ext } };
   },
   /**
    * performs action to obtain id and return a value in the callback's response argument
@@ -70,7 +72,7 @@ export const bidswitchSubmodule = {
           if (fpId) {
             setFirstPartyId(fpId);
           }
-          callback(userId);
+          callback({userId, fpId});
         },
         error: error => {
           utils.logError(`${MODULE_NAME}: bswId fetch encountered an error`, error);
@@ -86,9 +88,9 @@ export const bidswitchSubmodule = {
 };
 
 function getFirstPartyId() {
-  let fpId = storage.localStorageIsEnabled ? storage.getDataFromLocalStorage(FPID_KEY_NAME) : null;
+  let fpId = storage.localStorageIsEnabled ? storage.getDataFromLocalStorage(FPID_STRG_KEY_NAME) : null;
   if (!fpId) {
-    fpId = storage.cookiesAreEnabled ? storage.getCookie(FPID_KEY_NAME) : null;
+    fpId = storage.cookiesAreEnabled ? storage.getCookie(FPID_STRG_KEY_NAME) : null;
   }
   return fpId || '';
 }
@@ -96,9 +98,9 @@ function getFirstPartyId() {
 function setFirstPartyId(fpId) {
   if (fpId) {
     if (storage.localStorageIsEnabled) {
-      storage.setDataInLocalStorage(FPID_KEY_NAME, fpId);
+      storage.setDataInLocalStorage(FPID_STRG_KEY_NAME, fpId);
     } else if (storage.cookiesAreEnabled) {
-      storage.setCookie(FPID_KEY_NAME, fpId);
+      storage.setCookie(FPID_STRG_KEY_NAME, fpId);
     }
   }
 }

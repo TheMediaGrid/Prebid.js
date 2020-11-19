@@ -211,6 +211,17 @@ export const spec = {
           }]
         });
       }
+      if (userId.bsw_id && userId.bsw_id.id) {
+        userExt = userExt || {};
+        userExt.eids = userExt.eids || [];
+        userExt.eids.push({
+          source: 'bidswitch.net',
+          uids: [{
+            id: userId.bsw_id.id,
+            ext: userId.bsw_id.ext
+          }],
+        });
+      }
 
       if (userId.digitrustid && userId.digitrustid.data && userId.digitrustid.data.id) {
         userExt = userExt || {};
