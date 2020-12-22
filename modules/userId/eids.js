@@ -158,8 +158,8 @@ const USER_IDS_CONFIG = {
     atype: 1
   },
 
-  // Verizon Media
-  'vmuid': {
+  // Verizon Media ConnectID
+  'connectid': {
     source: 'verizonmedia.com',
     atype: 1
   },
@@ -175,6 +175,11 @@ const USER_IDS_CONFIG = {
       return data && data.ext;
     }
   },
+  // Neustar Fabrick
+  'fabrickId': {
+    source: 'neustar.biz',
+    atype: 1
+  }
 };
 
 // this function will create an eid object for the given UserId sub-module

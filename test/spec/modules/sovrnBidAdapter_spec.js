@@ -276,6 +276,32 @@ describe('sovrnBidAdapter', function() {
       expect(data.user.ext.tpid[0].uid).to.equal('A_CRITEO_ID')
       expect(data.user.ext.prebid_criteoid).to.equal('A_CRITEO_ID')
     });
+
+    it('should ignore empty segments', function() {
+      const payload = JSON.parse(request.data)
+      expect(payload.imp[0].ext).to.be.undefined
+    })
+
+    it('should pass the segments param value as trimmed deal ids array', function() {
+      const segmentsRequests = [{
+        'bidder': 'sovrn',
+        'params': {
+          'segments': ' test1,test2 '
+        },
+        'adUnitCode': 'adunit-code',
+        'sizes': [
+          [300, 250],
+          [300, 600]
+        ],
+        'bidId': '30b31c1838de1e',
+        'bidderRequestId': '22edbae2733bf6',
+        'auctionId': '1d1a030790a475'
+      }];
+      const request = spec.buildRequests(segmentsRequests, bidderRequest)
+      const payload = JSON.parse(request.data)
+      expect(payload.imp[0].ext.deals[0]).to.equal('test1')
+      expect(payload.imp[0].ext.deals[1]).to.equal('test2')
+    })
   });
 
   describe('interpretResponse', function () {
@@ -331,16 +357,16 @@ describe('sovrnBidAdapter', function() {
         'currency': 'USD',
         'netRevenue': true,
         'mediaType': 'banner',
-        'ad': decodeURIComponent(`<!-- Creative --><img src=<!-- NURL -->>`),
-        'ttl': 60000
+        'ad': decodeURIComponent(`<!-- Creative --><img src="<!-- NURL -->">`),
+        'ttl': 90
       }];
 
       let result = spec.interpretResponse(response);
-      expect(Object.keys(result[0])).to.deep.equal(Object.keys(expectedResponse[0]));
+      expect(result[0]).to.deep.equal(expectedResponse[0]);
     });
 
     it('should get correct bid response when dealId is passed', function () {
-      response.body.dealid = 'baking';
+      response.body.seatbid[0].bid[0].dealid = 'baking';
 
       let expectedResponse = [{
         'requestId': '263c448586f5a1',
@@ -352,12 +378,33 @@ describe('sovrnBidAdapter', function() {
         'currency': 'USD',
         'netRevenue': true,
         'mediaType': 'banner',
-        'ad': decodeURIComponent(`<!-- Creative --><img src=<!-- NURL -->>`),
-        'ttl': 60000
+        'ad': decodeURIComponent(`<!-- Creative --><img src="<!-- NURL -->">`),
+        'ttl': 90
       }];
 
       let result = spec.interpretResponse(response);
-      expect(Object.keys(result[0])).to.deep.equal(Object.keys(expectedResponse[0]));
+      expect(result[0]).to.deep.equal(expectedResponse[0]);
+    });
+
+    it('should get correct bid response when ttl is set', function () {
+      response.body.seatbid[0].bid[0].ext = { 'ttl': 480 };
+
+      let expectedResponse = [{
+        'requestId': '263c448586f5a1',
+        'cpm': 0.45882675,
+        'width': 728,
+        'height': 90,
+        'creativeId': 'creativelycreatedcreativecreative',
+        'dealId': null,
+        'currency': 'USD',
+        'netRevenue': true,
+        'mediaType': 'banner',
+        'ad': decodeURIComponent(`<!-- Creative --><img src="<!-- NURL -->">`),
+        'ttl': 480
+      }];
+
+      let result = spec.interpretResponse(response);
+      expect(result[0]).to.deep.equal(expectedResponse[0]);
     });
 
     it('handles empty bid response', function () {
